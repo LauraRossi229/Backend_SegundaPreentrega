@@ -3,7 +3,7 @@ import { cartModel } from "../models/carts.models.js";
 import mongoose from 'mongoose';
 
 
-const cartRoute = express.Router(); // Cambiado a cartRoute
+const cartRoute = express.Router(); 
 
 // GET api/carts/:cid - Obtener productos en un carrito
 cartRoute.get('/:cid', async (req, res) => {
@@ -38,7 +38,7 @@ cartRoute.post('/', async (req, res) => {
   
 
 // DELETE api/carts/:cid/products/:pid - Eliminar producto del carrito
-cartRoute.delete('/:cid/products/:pid', async (req, res) => { // Cambiado a cartRoute
+cartRoute.delete('/:cid/products/:pid', async (req, res) => { 
   try {
     const { cid, pid } = req.params;
     const cart = await cartModel.findOneAndUpdate(
@@ -112,7 +112,7 @@ cartRoute.put('/:cid/products/:pid', async (req, res) => {
   
 
 // DELETE api/carts/:cid - Eliminar todos los productos del carrito
-cartRoute.delete('/:cid', async (req, res) => { // Cambiado a cartRoute
+cartRoute.delete('/:cid', async (req, res) => { 
   try {
     const { cid } = req.params;
     const cart = await cartModel.findOneAndDelete({ _id: cid });
