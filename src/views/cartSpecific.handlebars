@@ -11,12 +11,10 @@
   <ul>
     {{#each cart.products}}
       <li>
-        {{this._id}} - (Cantidad: {{this.quantity}})
+        Producto: {{this.id_prod.title}} - Cantidad: {{this.quantity}}
       </li>
     {{/each}}
   </ul>
-
-
 
   <!-- Agrega un botón para volver a la lista de productos o hacer otras acciones -->
   <a href="/products">Volver a la lista de productos</a>
