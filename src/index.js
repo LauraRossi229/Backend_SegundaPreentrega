@@ -1,3 +1,4 @@
+import 'dotenv/config'
 import express from 'express';
 import mongoose from 'mongoose';
 import http from 'http';
@@ -9,6 +10,8 @@ import userRouter from './routes/users.routes.js';
 import productRouter from './routes/products.routes.js';
 import cartRouter from './routes/carts.routes.js';
 import { messageRoutes } from './routes/messages.routes.js';
+import { cartModel } from './models/carts.models.js';
+
 
 
 // Obtiene la ruta del directorio actual utilizando import.meta.url
@@ -54,13 +57,20 @@ app.set('io', io);
 app.use(express.static(path.join(__dirname, 'public')));
 
 const PORT = 8080;
+const MONGO_URL = process.env.MONGO_URL;
 
-mongoose.connect('mongodb+srv://rossil229:xxxxx@cluster0.oeqfqws.mongodb.net/?retryWrites=true&w=majority', {
+// Conexión a la base de datos MongoDB
+mongoose.connect(MONGO_URL, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 })
   .then(() => {
     console.log('La base de datos se conectó con éxito');
+  })
+  .catch((error) => {
+    console.error('Error en conexión a la BDD:', error);
+  });
+
     
     // Ahora que la conexión a la base de datos está establecida, puedes continuar con la configuración de las rutas y el servidor.
     app.use('/api/users', userRouter);
@@ -119,11 +129,29 @@ mongoose.connect('mongodb+srv://rossil229:xxxxx@cluster0.oeqfqws.mongodb.net/?re
       }
     });
 
-    
+    // Renderiza la vista HTML del carrito específico
+cartRouter.get('/cart/:cid', async (req, res) => {
+  const { cid } = req.params;
+
+  try {
+    const cart = await cartModel
+      .findById(cid)
+      .populate('products.id_prod'); // Cambiado a 'products.id_prod'
+
+    if (cart) {
+      // Renderiza la vista 'cartSpecific.handlebars' con los datos del carrito
+      res.render('cartSpecific', { cart }); // Asegúrate de tener acceso al objeto 'cart'
+    } else {
+      res.status(404).send({ respuesta: 'Error en consultar Carrito', mensaje: 'Not Found' });
+    }
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Error al cargar el carrito específico.');
+  }
+});
 
 
-    server.listen(PORT, () => {
-      console.log(`Servidor en ejecución en el puerto ${PORT}`);
-    });
-  })
-  .catch((error) => console.error('Error en la conexión a la base de datos:', error));
+   // Iniciar el servidor
+server.listen(PORT, () => {
+  console.log(`Servidor en ejecución en el puerto ${PORT}`);
+});
